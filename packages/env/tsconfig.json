@@ -1,0 +1,3 @@
+{
+  "extends": "@zenspend/config/tsconfig.base.json"
+}
