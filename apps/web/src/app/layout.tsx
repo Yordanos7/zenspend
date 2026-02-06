@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "zenspend",
-  description: "zenspend",
+  title: "ZenSpend AI",
+  description: "Zero-friction personal finance tracking with AI",
 };
 
 export default function RootLayout({
