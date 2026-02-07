@@ -25,7 +25,11 @@ export const categoryInfo: Record<string, { name: string; color: string; icon: a
   utilities: { name: 'Utilities', color: '#8884d8', icon: Zap },
   entertainment: { name: 'Entertainment', color: '#82ca9d', icon: Coffee },
   electronics: { name: 'Electronics', color: '#ffc658', icon: Smartphone },
+  misc: { name: 'Miscellaneous', color: '#cbd5e1', icon: ShoppingBag }, // Fallback icon
+  income: { name: 'Income', color: 'var(--success)', icon: Zap }, // Using Zap for now
 };
+
+export type Category = keyof typeof categoryInfo;
 
 export const categorySpending = [
   { category: 'housing', amount: 1200, percentage: 40 },
