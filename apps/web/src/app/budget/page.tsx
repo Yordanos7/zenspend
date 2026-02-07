@@ -4,17 +4,10 @@ import { motion } from 'framer-motion';
 import { budgets, subscriptions, categoryInfo } from '@/lib/mockData';
 import { cn } from '@/lib/utils';
 import { Plus, Edit2, Trash2, Calendar, CreditCard, AlertCircle } from 'lucide-react';
-import { GlassCard } from '@/components/ui/glass-card';
 
 export default function BudgetPage() {
   return (
     <main className="min-h-screen bg-background p-4 md:p-8 lg:p-12">
-        {/* Background Gradients */}
-        <div className="fixed top-0 left-0 w-screen h-screen overflow-hidden -z-10 pointer-events-none">
-            <div className="absolute bottom-[10%] left-[5%] w-[300px] h-[300px] bg-primary/10 rounded-full blur-[100px] opacity-20" />
-            <div className="absolute top-[20%] right-[15%] w-[400px] h-[400px] bg-accent/5 rounded-full blur-[120px] opacity-20" />
-        </div>
-
       <div className="max-w-5xl mx-auto space-y-8">
         {/* Header */}
         <motion.div
@@ -30,12 +23,11 @@ export default function BudgetPage() {
         </motion.div>
 
         {/* Monthly Budget Overview */}
-        <GlassCard
-            gradient
+        <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="p-6 md:p-8"
+            className="p-6 md:p-8 rounded-2xl border border-border bg-card text-card-foreground shadow-sm"
         >
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -44,7 +36,7 @@ export default function BudgetPage() {
                     {budgets.length} Active
                 </span>
             </h3>
-            <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30">
+            <button className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all shadow-sm">
               <Plus className="w-4 h-4" />
               Add Budget
             </button>
@@ -68,7 +60,7 @@ export default function BudgetPage() {
                 >
                   <div className="flex items-end justify-between mb-3">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-foreground shrink-0 border border-white/5">
+                      <div className="w-10 h-10 rounded-xl bg-muted/50 flex items-center justify-center text-foreground shrink-0">
                         <Icon className="w-5 h-5" style={{ color: category.color }} />
                       </div>
                       <div>
@@ -97,16 +89,16 @@ export default function BudgetPage() {
                     </div>
                   </div>
                   
-                  <div className="relative h-2.5 w-full bg-muted/30 rounded-full overflow-hidden">
+                  <div className="relative h-2.5 w-full bg-muted rounded-full overflow-hidden">
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `${Math.min(percentage, 100)}%` }}
                       transition={{ duration: 1, ease: 'easeOut', delay: 0.3 + index * 0.1 }}
                       className={cn(
-                        'h-full rounded-full shadow-[0_0_10px_currentColor]',
-                        isOverBudget && 'bg-destructive shadow-destructive/50',
-                        isNearLimit && 'bg-warning shadow-warning/50',
-                        !isOverBudget && !isNearLimit && 'bg-success shadow-success/50'
+                        'h-full rounded-full',
+                        isOverBudget && 'bg-destructive',
+                        isNearLimit && 'bg-warning',
+                        !isOverBudget && !isNearLimit && 'bg-success'
                       )}
                     />
                   </div>
@@ -121,7 +113,7 @@ export default function BudgetPage() {
               );
             })}
           </div>
-        </GlassCard>
+        </motion.div>
 
         {/* Subscriptions */}
         <section>
@@ -139,16 +131,16 @@ export default function BudgetPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {subscriptions.map((sub, index) => (
-                <GlassCard
+                <motion.div
                 key={sub.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.4 + index * 0.05 }}
-                className="p-5 group hover:border-primary/20 transition-colors"
+                className="p-5 rounded-xl border border-border bg-card text-card-foreground shadow-sm group hover:border-border/80 transition-colors"
                 >
                 <div className="flex items-start justify-between">
                     <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-background to-muted flex items-center justify-center text-xl font-bold text-foreground shadow-inner border border-white/5">
+                    <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center text-xl font-bold text-foreground">
                         {sub.icon}
                     </div>
                     <div>
@@ -166,7 +158,7 @@ export default function BudgetPage() {
                     </div>
                 </div>
                 
-                 <div className="mt-4 pt-4 border-t border-border/40 flex items-center justify-between opacity-60 group-hover:opacity-100 transition-opacity">
+                 <div className="mt-4 pt-4 border-t border-border flex items-center justify-between opacity-60 group-hover:opacity-100 transition-opacity">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <CreditCard className="w-3 h-3" />
                           <span>**** 4242</span>
@@ -175,14 +167,14 @@ export default function BudgetPage() {
                         <Trash2 className="w-4 h-4" />
                       </button>
                  </div>
-                </GlassCard>
+                </motion.div>
             ))}
             
              <motion.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }} 
-                className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-primary/5 transition-all group h-full min-h-[140px]"
+                className="flex flex-col items-center justify-center p-6 rounded-2xl border-2 border-dashed border-border hover:border-primary/50 hover:bg-muted/50 transition-all group h-full min-h-[140px]"
              >
                  <div className="w-10 h-10 rounded-full bg-muted group-hover:bg-primary/20 flex items-center justify-center transition-colors mb-3">
                      <Plus className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
