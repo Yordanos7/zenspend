@@ -56,3 +56,12 @@ export const transactions: Transaction[] = [
   { id: '5', description: 'Gas Station', amount: -45.00, date: '2023-10-19', category: 'transport' },
   { id: '6', description: 'Amazon Purchase', amount: -120.00, date: '2023-10-18', category: 'shopping' },
 ];
+
+export const monthlyTrends = [
+  { month: 'Aug', income: 4200, expenses: 2800 },
+  { month: 'Sep', income: 4500, expenses: 3100 },
+  { month: 'Oct', income: 4300, expenses: 2950 },
+  { month: 'Nov', income: 5100, expenses: 3500 },
+  { month: 'Dec', income: 4800, expenses: 4100 },
+  { month: 'Jan', income: 4600, expenses: 2600 },
+];
