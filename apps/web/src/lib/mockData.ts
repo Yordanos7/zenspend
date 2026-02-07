@@ -64,4 +64,19 @@ export const monthlyTrends = [
   { month: 'Nov', income: 5100, expenses: 3500 },
   { month: 'Dec', income: 4800, expenses: 4100 },
   { month: 'Jan', income: 4600, expenses: 2600 },
+  { month: 'Jan', income: 4600, expenses: 2600 },
+];
+
+export const budgets = [
+  { category: 'food' as Category, limit: 600, spent: 450 },
+  { category: 'transport' as Category, limit: 400, spent: 380 },
+  { category: 'entertainment' as Category, limit: 300, spent: 150 },
+  { category: 'shopping' as Category, limit: 500, spent: 520 }, // Over budget
+];
+
+export const subscriptions = [
+  { id: '1', name: 'Netflix', amount: 15.99, nextPayment: '2023-11-23', cycle: 'monthly', icon: 'N' }, // Simple icon for now
+  { id: '2', name: 'Spotify', amount: 9.99, nextPayment: '2023-11-25', cycle: 'monthly', icon: 'S' },
+  { id: '3', name: 'Adobe C.C.', amount: 54.99, nextPayment: '2023-11-15', cycle: 'monthly', icon: 'A' },
+  { id: '4', name: 'Amazon Prime', amount: 139.00, nextPayment: '2024-02-12', cycle: 'yearly', icon: 'P' },
 ];
