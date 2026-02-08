@@ -36,7 +36,7 @@ export default function Header() {
               return (
                 <Link
                   key={to}
-                  href={to}
+                  href={to as any}
                   className="group flex items-center gap-2 text-sm font-medium text-slate-500 transition-all hover:text-primary dark:text-slate-400 dark:hover:text-white"
                 >
                   <Icon className="h-4 w-4 transition-transform group-hover:scale-110" />
