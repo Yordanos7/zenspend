@@ -87,3 +87,10 @@ export const alerts = [
   { id: '3', type: 'success' as const, title: 'Budget Goal Met', message: 'Congratulations! You stayed under your Food budget for 3 months in a row.', date: '2023-10-20' },
   { id: '4', type: 'info' as const, title: 'New Feature', message: 'Check out the new Analytics page to see your spending trends.', date: '2023-10-18', action: 'Try it out' },
 ];
+
+export const goals = [
+  { id: '1', name: 'Emergency Fund', target: 5000, current: 3250, icon: 'Shield', color: 'bg-emerald-500', deadline: '2023-12-31' },
+  { id: '2', name: 'New Car', target: 25000, current: 8500, icon: 'Car', color: 'bg-blue-500', deadline: '2024-06-30' },
+  { id: '3', name: 'Japan Trip', target: 4000, current: 1200, icon: 'Plane', color: 'bg-purple-500', deadline: '2024-04-15' },
+  { id: '4', name: 'New Laptop', target: 2000, current: 1800, icon: 'Laptop', color: 'bg-orange-500', deadline: '2023-11-30' },
+];
