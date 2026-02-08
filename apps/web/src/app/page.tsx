@@ -1,32 +1,26 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { ArrowRight, BarChart3, MessageSquare, ShieldCheck, Sparkles } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight, BarChart3, MessageSquare, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import HeroBackground from "@/components/hero-background";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col overflow-hidden bg-background">
+    <main className="flex min-h-[calc(100vh-4rem)] flex-col">
       {/* Hero Section */}
-      <section className="relative flex flex-col items-center justify-center px-4 pt-24 pb-20 md:pt-32 lg:pt-40">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-100 via-transparent to-transparent dark:from-blue-900/20" />
+      <section className="relative flex-1 overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-950 dark:via-[#0F172A] dark:to-slate-950 py-12 lg:py-20 lg:min-h-[800px] flex items-center">
+        {/* Live Animated Background */}
+        <HeroBackground />
         
-        <div className="container mx-auto">
-          <div className="flex flex-col items-center text-center lg:items-start lg:text-left lg:flex-row lg:justify-between lg:gap-12">
+        <div className="container relative z-10 mx-auto px-4">
+          <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             
             {/* Left Content */}
-            <div className="max-w-2xl lg:pt-8 relative z-10">
-              <div className="mb-6 inline-flex items-center rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm text-blue-600 dark:border-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                <span className="flex items-center gap-1">
-                  <Sparkles className="h-4 w-4" />
-                  <span>The Future of Personal Finance</span>
-                </span>
-              </div>
-              
-              <div className="mb-8">
-                <h1 className="mb-6 text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-6xl md:text-7xl lg:text-7xl leading-[1.1]">
+            <div className="max-w-2xl space-y-8 text-center lg:text-left">
+              <div className="space-y-6">
+                <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-5xl lg:text-7xl leading-tight">
                   FINANCIAL CLARITY,
                   <br />
                   <span className="text-primary dark:text-[#60A5FA]">
@@ -40,14 +34,14 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
-                <Link href="/dashboard">
-                  <Button 
+                  <Link href="/dashboard">
+                    <Button 
                     size="lg" 
                     className="h-14 min-w-[180px] rounded-full bg-primary hover:bg-primary/90 px-8 text-lg font-semibold text-primary-foreground shadow-lg shadow-blue-900/20 transition-all hover:scale-105"
-                  >
+                    >
                     START FOR FREE
-                  </Button>
-                </Link>
+                    </Button>
+                  </Link>
                 <Button 
                   variant="outline" 
                   size="lg" 
@@ -59,19 +53,17 @@ export default function Home() {
             </div>
 
             {/* Right Content - Hero Image */}
-            <div className="relative mx-auto w-full max-w-[650px] lg:mx-0 lg:max-w-none flex justify-center lg:justify-end mt-12 lg:mt-0">
+            <div className="relative mx-auto w-full max-w-[650px] lg:mx-0 lg:max-w-none flex justify-center lg:justify-end">
               <div className="absolute -inset-4 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-900/20 z-0" />
-              <div className="relative z-10 w-full animate-in fade-in slide-in-from-bottom-8 duration-1000">
-                {/* Hero image placeholder or re-add the image if updating public folder */}
-                 <div className="relative aspect-square w-full max-w-md mx-auto hidden md:block">
-                     {/* If the image was deleted or not present, we can use a mockup or ensure it exists. 
-                         For now, I will assume the image path is valid or provide a safe fallback if needed.
-                         The user script had "/hero-tablet-royal.png". I'll trust it exists or use a div fallback.
-                      */}
-                    <div className="w-full h-full rounded-2xl bg-gradient-to-br from-primary/20 to-accent/20 border border-white/10 shadow-2xl backdrop-blur-sm flex items-center justify-center">
-                        <BarChart3 className="w-32 h-32 text-primary/50" />
-                    </div>
-                 </div>
+              <div className="relative z-10 w-full">
+                <Image
+                  src="/hero-tablet-royal.png"
+                  alt="ZenSpend AI Dashboard on Tablet"
+                  width={800}
+                  height={800}
+                  priority
+                  className="drop-shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000 object-contain"
+                />
               </div>
             </div>
           </div>
