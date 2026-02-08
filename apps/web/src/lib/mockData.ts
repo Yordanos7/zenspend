@@ -82,8 +82,8 @@ export const subscriptions = [
 ];
 
 export const alerts = [
-  { id: '1', type: 'warning' as const, title: 'Unusual Spending', message: 'You spent $120 on Shopping, which is 50% higher than usual.', date: '2023-10-25', action: 'View Transaction' },
-  { id: '2', type: 'info' as const, title: 'Bill Reminder', message: 'Netflix subscription payment of $15.99 is due tomorrow.', date: '2023-10-22', action: 'Pay Now' },
+  { id: '1', type: 'warning' as const, title: 'Unusual Spending', message: 'You spent Birr 120 on Shopping, which is 50% higher than usual.', date: '2023-10-25', action: 'View Transaction' },
+  { id: '2', type: 'info' as const, title: 'Bill Reminder', message: 'Netflix subscription payment of Birr 15.99 is due tomorrow.', date: '2023-10-22', action: 'Pay Now' },
   { id: '3', type: 'success' as const, title: 'Budget Goal Met', message: 'Congratulations! You stayed under your Food budget for 3 months in a row.', date: '2023-10-20' },
   { id: '4', type: 'info' as const, title: 'New Feature', message: 'Check out the new Analytics page to see your spending trends.', date: '2023-10-18', action: 'Try it out' },
 ];

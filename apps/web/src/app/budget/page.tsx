@@ -66,9 +66,9 @@ export default function BudgetPage() {
                       <div>
                         <p className="font-medium text-foreground">{category.name}</p>
                         <p className="text-sm text-muted-foreground mt-0.5">
-                          <span className="font-medium text-foreground">${budget.spent.toLocaleString()}</span> 
+                          <span className="font-medium text-foreground">Birr {budget.spent.toLocaleString()}</span>  
                           <span className="opacity-50 mx-1">/</span> 
-                          ${budget.limit.toLocaleString()}
+                          Birr {budget.limit.toLocaleString()}
                         </p>
                       </div>
                     </div>
@@ -123,7 +123,7 @@ export default function BudgetPage() {
                 </div>
                  <div className="text-right">
                     <p className="text-2xl font-bold tracking-tight text-foreground">
-                        ${subscriptions.reduce((sum, s) => sum + s.amount, 0).toFixed(2)}
+                        Birr {subscriptions.reduce((sum, s) => sum + s.amount, 0).toFixed(2)}
                         <span className="text-sm font-normal text-muted-foreground ml-1">/mo</span>
                     </p>
                 </div>
@@ -153,7 +153,7 @@ export default function BudgetPage() {
                     </div>
                     
                     <div className="text-right">
-                        <p className="font-bold text-foreground">${sub.amount.toFixed(2)}</p>
+                        <p className="font-bold text-foreground">Birr {sub.amount.toFixed(2)}</p>
                         <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">{sub.cycle}</p>
                     </div>
                 </div>

@@ -1,6 +1,6 @@
 
 import { motion } from 'framer-motion';
-import { transactions, categoryInfo, Transaction } from '@/lib/mockData';
+import { transactions, categoryInfo, type Transaction } from '@/lib/mockData';
 import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -68,9 +68,9 @@ function TransactionRow({ transaction, index }: { transaction: Transaction; inde
             isPositive ? 'text-success' : 'text-foreground'
           )}
         >
-          {isPositive ? '+' : ''}{transaction.amount.toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
+          {isPositive ? '+' : ''}Birr {transaction.amount.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
           })}
         </p>
         <p className="text-xs text-muted-foreground">

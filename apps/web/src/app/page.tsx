@@ -49,7 +49,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
             <StatCard
               title="Total Balance"
-              value="$12,450.00"
+              value="Birr 12,450.00"
               icon={<Wallet className="w-5 h-5 text-primary" />}
               variant="primary"
               trend="up"
@@ -57,7 +57,7 @@ export default function Dashboard() {
             />
             <StatCard
               title="Monthly Income"
-              value="$4,250.00"
+              value="Birr 4,250.00"
               icon={<ArrowUpRight className="w-5 h-5 text-success" />}
               variant="success"
               trend="up"
@@ -65,7 +65,7 @@ export default function Dashboard() {
             />
             <StatCard
               title="Monthly Expenses"
-              value="$1,235.00"
+              value="Birr 1,235.00"
               icon={<ArrowDownRight className="w-5 h-5 text-destructive" />}
               variant="default" // Using default but could be warning/destructive style if defined
               trend="down"
@@ -73,8 +73,8 @@ export default function Dashboard() {
             />
              <StatCard
               title="Savings Goal"
-              value="$8,000.00"
-              subtitle="Target: $10,000"
+              value="Birr 8,000.00"
+              subtitle="Target: Birr 10,000"
               icon={<TrendingUp className="w-5 h-5 text-warning" />}
               variant="warning"
               trend="up"
@@ -105,7 +105,7 @@ export default function Dashboard() {
                     type="warning"
                   />
                   <InsightCard 
-                    insight="Based on your current spending, you're projected to save $450 this month." 
+                    insight="Based on your current spending, you're projected to save Birr 450 this month." 
                     type="neutral"
                   />
                 </div>

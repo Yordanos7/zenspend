@@ -165,9 +165,9 @@ function TransactionRow({ transaction, index }: { transaction: Transaction; inde
             isPositive ? 'text-success' : 'text-foreground'
           )}
         >
-          {isPositive ? '+' : ''}{transaction.amount.toLocaleString('en-US', {
-            style: 'currency',
-            currency: 'USD',
+          {isPositive ? '+' : ''}Birr {transaction.amount.toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
           })}
         </span>
       </div>

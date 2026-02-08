@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Sparkles, LayoutDashboard, Home, Wallet } from "lucide-react";
+import { Sparkles, LayoutDashboard, Home } from "lucide-react";
 
 import { ModeToggle } from "./mode-toggle";
 import UserMenu from "./user-menu";
@@ -20,16 +20,13 @@ export default function Header() {
             href="/" 
             className="group flex items-center gap-2 text-xl font-bold transition-all hover:opacity-90"
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md transition-all group-hover:shadow-lg">
-              <Wallet className="h-5 w-5" />
+            <div className="relative flex h-10 w-10 overflow-hidden items-center justify-center rounded-xl bg-transparent transition-all group-hover:scale-105">
+                 <img src="/logo.png" alt="ZenSpend AI Logo" className="h-full w-full object-contain" />
             </div>
             <span className="text-slate-900 dark:text-white">
               ZenSpend
             </span>
-            <span className="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 dark:border-amber-900/50 dark:bg-amber-900/20 dark:text-amber-400">
-              <Sparkles className="h-3 w-3" />
-              AI
-            </span>
+
           </Link>
 
           {/* Navigation */}

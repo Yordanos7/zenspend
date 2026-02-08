@@ -12,7 +12,7 @@ interface Message {
 }
 
 const suggestedQuestions = [
-  'Can I afford a $1,000 vacation?',
+  'Can I afford a Birr 1,000 vacation?',
   'How much did I spend on food this month?',
   'Where can I cut expenses?',
   'What are my biggest spending categories?',
@@ -65,21 +65,21 @@ export default function AICoachPage() {
     // Simulate AI response
     setTimeout(() => {
       const responses: Record<string, string> = {
-        'Can I afford a $1,000 vacation?': 
-          "Based on your current finances, let me analyze this for you:\n\n**Current Status:**\n- Remaining budget this month: $3,835\n- Average monthly savings: $1,200\n\n**My Assessment:**\nYes, you can afford a $1,000 vacation! Here's why:\n\n1. Your spending is 12% below average this month\n2. You have consistent income from your salary ($5,500) plus occasional freelance work\n3. You've been meeting your savings goals\n\n**Recommendation:** I'd suggest booking for next month and setting aside $250/week starting now. This way, you'll have the full amount ready without impacting your emergency fund. Would you like me to help you create a vacation savings plan?",
+  'Can I afford a Birr 1,000 vacation?': 
+          "Based on your current finances, let me analyze this for you:\n\n**Current Status:**\n- Remaining budget this month: Birr 3,835\n- Average monthly savings: Birr 1,200\n\n**My Assessment:**\nYes, you can afford a Birr 1,000 vacation! Here's why:\n\n1. Your spending is 12% below average this month\n2. You have consistent income from your salary (Birr 5,500) plus occasional freelance work\n3. You've been meeting your savings goals\n\n**Recommendation:** I'd suggest booking for next month and setting aside Birr 250/week starting now. This way, you'll have the full amount ready without impacting your emergency fund. Would you like me to help you create a vacation savings plan?",
         
         'How much did I spend on food this month?':
-          "Here's your food spending breakdown for January:\n\n**Total Food Spending: $455.92**\n\n**Breakdown:**\n- Groceries (Whole Foods, Trader Joe's): $149.47\n- Dining Out: $243.45\n- Coffee & Quick Bites: $63.00\n\n**Compared to Last Month:** You spent 18% more on food this January.\n\n**Insight:** Your dining out expenses are higher than usual. Consider meal prepping 2-3 days a week to bring this down. Would you like me to suggest a weekly food budget?",
+          "Here's your food spending breakdown for January:\n\n**Total Food Spending: Birr 455.92**\n\n**Breakdown:**\n- Groceries (Whole Foods, Trader Joe's): Birr 149.47\n- Dining Out: Birr 243.45\n- Coffee & Quick Bites: Birr 63.00\n\n**Compared to Last Month:** You spent 18% more on food this January.\n\n**Insight:** Your dining out expenses are higher than usual. Consider meal prepping 2-3 days a week to bring this down. Would you like me to suggest a weekly food budget?",
         
         'Where can I cut expenses?':
-          "I've analyzed your spending patterns. Here are my top recommendations:\n\n**1. Subscriptions ($158/month)**\nYou have 5 active subscriptions. The iCloud storage ($2.99) and gym membership ($49) have low usage based on your patterns.\n\n**2. Transport ($320/month)**\nYou've already reduced this by 16% over 3 months—great job! Consider carpooling once a week for additional $40-60/month savings.\n\n**3. Dining Out ($243/month)**\nThis is 53% of your food budget. Cutting 2 restaurant visits/week could save $150/month.\n\n**Total Potential Savings: $200-250/month**\n\nWhich area would you like to focus on first?",
+          "I've analyzed your spending patterns. Here are my top recommendations:\n\n**1. Subscriptions (Birr 158/month)**\nYou have 5 active subscriptions. The iCloud storage (Birr 2.99) and gym membership (Birr 49) have low usage based on your patterns.\n\n**2. Transport (Birr 320/month)**\nYou've already reduced this by 16% over 3 months—great job! Consider carpooling once a week for additional Birr 40-60/month savings.\n\n**3. Dining Out (Birr 243/month)**\nThis is 53% of your food budget. Cutting 2 restaurant visits/week could save Birr 150/month.\n\n**Total Potential Savings: Birr 200-250/month**\n\nWhich area would you like to focus on first?",
         
         'What are my biggest spending categories?':
-          "Here's your spending breakdown for January:\n\n**1. 🏠 Rent & Housing — $1,800 (42%)**\nThis is your largest fixed expense. It's within the recommended 30-35% for your income, so you're doing well here.\n\n**2. 🍔 Food & Dining — $455 (11%)**\nSlightly higher than last month. Most of this is dining out.\n\n**3. 🚗 Transport — $320 (8%)**\nTrending down—you've saved $80 compared to 3 months ago.\n\n**4. 💡 Utilities — $204 (5%)**\nNormal for this time of year.\n\n**5. 🛍️ Shopping — $203 (5%)**\nMostly Amazon and Target purchases.\n\nWould you like detailed advice on any of these categories?",
+          "Here's your spending breakdown for January:\n\n**1. 🏠 Rent & Housing — Birr 1,800 (42%)**\nThis is your largest fixed expense. It's within the recommended 30-35% for your income, so you're doing well here.\n\n**2. 🍔 Food & Dining — Birr 455 (11%)**\nSlightly higher than last month. Most of this is dining out.\n\n**3. 🚗 Transport — Birr 320 (8%)**\nTrending down—you've saved Birr 80 compared to 3 months ago.\n\n**4. 💡 Utilities — Birr 204 (5%)**\nNormal for this time of year.\n\n**5. 🛍️ Shopping — Birr 203 (5%)**\nMostly Amazon and Target purchases.\n\nWould you like detailed advice on any of these categories?",
       };
 
       const response = responses[text] || 
-        "I understand you're asking about your finances. Based on your current data:\n\n- Your total spending this month is $2,514\n- You have $3,835 remaining in your budget\n- You're on track with your financial goals\n\nIs there something specific you'd like me to analyze or help you plan for?";
+        "I understand you're asking about your finances. Based on your current data:\n\n- Your total spending this month is Birr 2,514\n- You have Birr 3,835 remaining in your budget\n- You're on track with your financial goals\n\nIs there something specific you'd like me to analyze or help you plan for?";
 
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
