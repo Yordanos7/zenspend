@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter, Calendar, Download } from 'lucide-react';
 import { transactions, categoryInfo, Transaction, Category } from '@/lib/mockData';
+import { ReceiptUploader } from '@/components/dashboard/ReceiptUploader';
 import { cn } from '@/lib/utils';
 
 export default function TransactionsPage() {
@@ -31,6 +32,9 @@ export default function TransactionsPage() {
           <h1 className="text-3xl font-bold tracking-tight text-foreground">Transactions</h1>
           <p className="text-muted-foreground mt-1">Your complete financial memory</p>
         </motion.div>
+
+        {/* Receipt Uploader */}
+        <ReceiptUploader />
 
         {/* Filters */}
         <motion.div
