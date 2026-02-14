@@ -1,0 +1,36 @@
+model Category {
+  id           String        @id @default(cuid())
+  name         String        @unique
+  color        String?
+  icon         String?
+  budgets      Budget[]
+  transactions Transaction[]
+
+  @@map("category")
+}
+
+model Budget {
+  id         String   @id @default(cuid())
+  limit      Float
+  userId     String
+  categoryId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("budget")
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  description String
+  amount      Float
+  date        DateTime @default(now())
+  userId      String
+  categoryId  String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("transaction")
+}
