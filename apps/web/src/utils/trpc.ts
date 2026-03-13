@@ -1,25 +1,21 @@
 import type { AppRouter } from "@zenspend/api/routers/index";
 
-import { QueryCache, QueryClient } from "@tanstack/react-query";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { createTRPCReact } from "@trpc/react-query";
+import { httpBatchLink } from "@trpc/client";
 import { env } from "@zenspend/env/web";
-import { toast } from "sonner";
+
+export const trpc = createTRPCReact<AppRouter>();
 
 export const queryClient = new QueryClient({
-  queryCache: new QueryCache({
-    onError: (error, query) => {
-      toast.error(error.message, {
-        action: {
-          label: "retry",
-          onClick: query.invalidate,
-        },
-      });
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
     },
-  }),
+  },
 });
 
-const trpcClient = createTRPCClient<AppRouter>({
+export const trpcClient = trpc.createClient({
   links: [
     httpBatchLink({
       url: `${env.NEXT_PUBLIC_SERVER_URL}/trpc`,
@@ -31,9 +27,4 @@ const trpcClient = createTRPCClient<AppRouter>({
       },
     }),
   ],
-});
-
-export const trpc = createTRPCOptionsProxy<AppRouter>({
-  client: trpcClient,
-  queryClient,
 });

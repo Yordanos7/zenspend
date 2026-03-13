@@ -3,29 +3,77 @@
 
 import { motion } from 'framer-motion';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { categorySpending, categoryInfo } from '@/lib/mockData';
+import { trpc } from '@/utils/trpc';
+import { ShoppingBag } from 'lucide-react';
 
 export function CategoryDonut() {
-  const data = categorySpending.map((item) => ({
-    name: categoryInfo[item.category].name,
+  const { data: spendingData = [], isLoading } = trpc.transaction.getSpendingByCategory.useQuery();
+
+  if (isLoading) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+        className="p-6 rounded-2xl border border-border bg-card text-card-foreground shadow-sm h-full"
+      >
+        <h3 className="text-sm font-medium text-muted-foreground mb-6">Spending by Category</h3>
+        <div className="flex flex-col sm:flex-row items-center gap-8 justify-center h-[calc(100%-2rem)]">
+          <div className="w-48 h-48 bg-muted rounded-full animate-pulse"></div>
+          <div className="flex-1 space-y-3 w-full max-w-xs">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-2 h-2 rounded-full bg-muted animate-pulse"></div>
+                  <div className="h-4 bg-muted rounded w-20 animate-pulse"></div>
+                </div>
+                <div className="h-4 bg-muted rounded w-16 animate-pulse"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  if (spendingData.length === 0) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+        className="p-6 rounded-2xl border border-border bg-card text-card-foreground shadow-sm h-full"
+      >
+        <h3 className="text-sm font-medium text-muted-foreground mb-6">Spending by Category</h3>
+        <div className="flex items-center justify-center h-[calc(100%-2rem)]">
+          <div className="text-center">
+            <ShoppingBag className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground">No spending data yet</p>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  const data = spendingData.map((item, index) => ({
+    name: item.category.charAt(0).toUpperCase() + item.category.slice(1),
     value: item.amount,
-    color: categoryInfo[item.category].color,
-    icon: categoryInfo[item.category].icon,
-    percentage: item.percentage,
+    color: item.color || `hsl(${index * 45}, 70%, 60%)`,
+    count: item.count,
   }));
+
+  const total = data.reduce((sum, item) => sum + item.value, 0);
 
   const CustomTooltip = ({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
-      const Icon = data.icon;
       return (
         <div className="bg-popover text-popover-foreground px-4 py-3 rounded-xl shadow-xl border border-border">
           <div className="flex items-center gap-2 mb-1">
-             <Icon className="w-4 h-4 text-muted-foreground" />
              <span className="text-sm font-medium">{data.name}</span>
           </div>
-          <p className="text-lg font-semibold">${data.value.toLocaleString()}</p>
-          <p className="text-xs text-muted-foreground">{data.percentage}% of total</p>
+          <p className="text-lg font-semibold">Birr {data.value.toLocaleString()}</p>
+          <p className="text-xs text-muted-foreground">{data.count} transactions</p>
         </div>
       );
     }
@@ -64,15 +112,15 @@ export function CategoryDonut() {
               <Tooltip content={<CustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
              <span className="text-xs text-muted-foreground font-medium">Total Spent</span>
+             <span className="text-lg font-bold">Birr {total.toLocaleString()}</span>
           </div>
         </div>
 
         {/* Legend */}
         <div className="flex-1 space-y-3 w-full max-w-xs">
           {data.slice(0, 5).map((item, index) => {
-             const Icon = item.icon;
              return (
             <motion.div
               key={item.name}
@@ -87,11 +135,10 @@ export function CategoryDonut() {
                   style={{ backgroundColor: item.color, borderColor: item.color }}
                 />
                 <span className="text-sm text-foreground flex items-center gap-2">
-                   <Icon className="w-4 h-4 text-muted-foreground" />
                    {item.name}
                 </span>
               </div>
-              <span className="text-sm font-medium tabular-nums">${item.value.toLocaleString()}</span>
+              <span className="text-sm font-medium tabular-nums">Birr {item.value.toLocaleString()}</span>
             </motion.div>
           )})}
         </div>

@@ -34,7 +34,7 @@ export default function Home() {
               </div>
 
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center lg:justify-start">
-                  <Link href="/dashboard">
+                  <Link href="/login">
                     <Button 
                     size="lg" 
                     className="h-14 min-w-[180px] rounded-full bg-primary hover:bg-primary/90 px-8 text-lg font-semibold text-primary-foreground shadow-lg shadow-blue-900/20 transition-all hover:scale-105"
@@ -42,13 +42,15 @@ export default function Home() {
                     START FOR FREE
                     </Button>
                   </Link>
-                <Button 
-                  variant="outline" 
-                  size="lg" 
-                  className="h-14 min-w-[180px] rounded-full border-slate-200 bg-white px-8 text-lg font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-transparent dark:text-slate-300 dark:hover:bg-slate-800"
-                >
-                  LEARN MORE
-                </Button>
+                <Link href="/login">
+                  <Button 
+                    variant="outline" 
+                    size="lg" 
+                    className="h-14 min-w-[180px] rounded-full border-slate-200 bg-white px-8 text-lg font-semibold text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:bg-transparent dark:text-slate-300 dark:hover:bg-slate-800"
+                  >
+                    SIGN IN
+                  </Button>
+                </Link>
               </div>
             </div>
 

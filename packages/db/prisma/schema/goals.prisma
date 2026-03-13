@@ -1,0 +1,38 @@
+model Goal {
+  id        String   @id @default(cuid())
+  name      String
+  target    Float
+  current   Float    @default(0)
+  deadline  DateTime?
+  color     String?
+  icon      String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+  @@map("goal")
+}
+
+model Alert {
+  id        String    @id @default(cuid())
+  type      AlertType
+  title     String
+  message   String
+  action    String?
+  isRead    Boolean   @default(false)
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("alert")
+}
+
+enum AlertType {
+  WARNING
+  INFO
+  SUCCESS
+}
