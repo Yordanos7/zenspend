@@ -19,6 +19,7 @@ import { CategoryDonut } from "@/components/dashboard/CategoryDonut";
 import { RecentTransactions } from "@/components/dashboard/RecentTransactions";
 import { InsightCard } from "@/components/dashboard/InsightCard";
 import { ReceiptUploader } from "@/components/dashboard/ReceiptUploader";
+import { BudgetOverview } from "@/components/dashboard/BudgetOverview";
 import { Button } from "@/components/ui/button";
 
 
@@ -167,8 +168,9 @@ export default function Dashboard() {
             </div>
 
             {/* Right Column (1/3) */}
-            <div className="lg:col-span-1 h-full">
+            <div className="lg:col-span-1 space-y-6">
               <RecentTransactions />
+              <BudgetOverview />
             </div>
           </div>
         </motion.div>

@@ -2,23 +2,59 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { alerts as initialAlerts } from '@/lib/mockData';
+import { trpc } from '@/utils/trpc';
 import { cn } from '@/lib/utils';
-import { AlertTriangle, Info, CheckCircle, ArrowRight, Bell, BellOff, X, Filter, CheckCheck } from 'lucide-react';
+import { AlertTriangle, Info, CheckCircle, ArrowRight, Bell, BellOff, X, Filter, CheckCheck, Zap } from 'lucide-react';
+import { toast } from 'sonner';
 
-type AlertType = 'warning' | 'info' | 'success';
+type AlertType = 'WARNING' | 'INFO' | 'SUCCESS';
 type FilterType = 'all' | AlertType;
 
+type Alert = {
+  id: string;
+  type: AlertType;
+  title: string;
+  message: string;
+  action?: string | null;
+  isRead: boolean;
+  createdAt: Date;
+};
+
 export default function AlertsPage() {
-  const [alerts, setAlerts] = useState(initialAlerts);
   const [filter, setFilter] = useState<FilterType>('all');
 
+  // Fetch alerts
+  const { data: alerts = [], isLoading, refetch } = trpc.alert.getAll.useQuery();
+  
+  // Mutations
+  const markAsRead = trpc.alert.markAsRead.useMutation({
+    onSuccess: () => refetch(),
+  });
+  
+  const deleteAlert = trpc.alert.delete.useMutation({
+    onSuccess: () => {
+      toast.success('Alert dismissed');
+      refetch();
+    },
+  });
+  
+  const generateBudgetAlerts = trpc.alert.generateBudgetAlerts.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Generated ${data.alertsGenerated} new alerts`);
+      refetch();
+    },
+  });
+
   const removeAlert = (id: string) => {
-    setAlerts(prev => prev.filter(alert => alert.id !== id));
+    deleteAlert.mutate({ id });
   };
 
   const markAllAsRead = () => {
-    setAlerts([]);
+    alerts.forEach(alert => {
+      if (!alert.isRead) {
+        markAsRead.mutate({ id: alert.id });
+      }
+    });
   };
 
   const filteredAlerts = alerts.filter(alert => 
@@ -27,34 +63,52 @@ export default function AlertsPage() {
 
   const getAlertIcon = (type: AlertType) => {
     switch (type) {
-      case 'warning':
+      case 'WARNING':
         return <AlertTriangle className="w-5 h-5" />;
-      case 'info':
+      case 'INFO':
         return <Info className="w-5 h-5" />;
-      case 'success':
+      case 'SUCCESS':
         return <CheckCircle className="w-5 h-5" />;
     }
   };
 
   const getAlertStyles = (type: AlertType) => {
     switch (type) {
-      case 'warning':
+      case 'WARNING':
         return {
           card: 'border-warning/30 bg-warning/5',
           icon: 'bg-warning/20 text-warning',
         };
-      case 'info':
+      case 'INFO':
         return {
           card: 'border-primary/20 bg-primary/5',
           icon: 'bg-primary/10 text-primary',
         };
-      case 'success':
+      case 'SUCCESS':
         return {
           card: 'border-success/30 bg-success/5',
           icon: 'bg-success/20 text-success',
         };
     }
   };
+
+  if (isLoading) {
+    return (
+      <main className="min-h-screen bg-background p-4 md:p-8 lg:p-12">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-muted rounded w-64 mb-2"></div>
+            <div className="h-4 bg-muted rounded w-96"></div>
+          </div>
+          <div className="space-y-4">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="h-24 bg-muted rounded-xl animate-pulse"></div>
+            ))}
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background p-4 md:p-8 lg:p-12">
@@ -71,6 +125,14 @@ export default function AlertsPage() {
             <p className="text-muted-foreground mt-1">AI-powered financial monitoring</p>
           </div>
           <div className="flex items-center gap-2">
+            <button 
+              onClick={() => generateBudgetAlerts.mutate()}
+              disabled={generateBudgetAlerts.isPending}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+            >
+              <Zap className="w-4 h-4" />
+              {generateBudgetAlerts.isPending ? 'Generating...' : 'Check Budgets'}
+            </button>
             <button 
                 onClick={markAllAsRead} 
                 disabled={alerts.length === 0}
@@ -105,40 +167,40 @@ export default function AlertsPage() {
                 All ({alerts.length})
             </button>
             <button
-                onClick={() => setFilter('warning')}
+                onClick={() => setFilter('WARNING')}
                 className={cn(
                     "px-4 py-2 rounded-full text-sm font-medium transition-colors border flex items-center gap-2",
-                    filter === 'warning' 
+                    filter === 'WARNING' 
                         ? "bg-warning/10 text-warning border-warning" 
                         : "bg-background text-muted-foreground border-border hover:text-warning hover:border-warning/50"
                 )}
             >
                 <div className="w-2 h-2 rounded-full bg-warning" />
-                Warnings ({alerts.filter(a => a.type === 'warning').length})
+                Warnings ({alerts.filter(a => a.type === 'WARNING').length})
             </button>
              <button
-                onClick={() => setFilter('info')}
+                onClick={() => setFilter('INFO')}
                 className={cn(
                     "px-4 py-2 rounded-full text-sm font-medium transition-colors border flex items-center gap-2",
-                    filter === 'info' 
+                    filter === 'INFO' 
                         ? "bg-primary/10 text-primary border-primary" 
                         : "bg-background text-muted-foreground border-border hover:text-primary hover:border-primary/50"
                 )}
             >
                 <div className="w-2 h-2 rounded-full bg-primary" />
-                Insights ({alerts.filter(a => a.type === 'info').length})
+                Insights ({alerts.filter(a => a.type === 'INFO').length})
             </button>
              <button
-                onClick={() => setFilter('success')}
+                onClick={() => setFilter('SUCCESS')}
                 className={cn(
                     "px-4 py-2 rounded-full text-sm font-medium transition-colors border flex items-center gap-2",
-                    filter === 'success' 
+                    filter === 'SUCCESS' 
                         ? "bg-success/10 text-success border-success" 
                         : "bg-background text-muted-foreground border-border hover:text-success hover:border-success/50"
                 )}
             >
                 <div className="w-2 h-2 rounded-full bg-success" />
-                Achievements ({alerts.filter(a => a.type === 'success').length})
+                Achievements ({alerts.filter(a => a.type === 'SUCCESS').length})
             </button>
         </motion.div>
 
@@ -155,7 +217,7 @@ export default function AlertsPage() {
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: -10 }}
                     transition={{ duration: 0.2 }}
-                    className={cn('relative p-5 rounded-xl border transition-colors group', styles.card)}
+                    className={cn('relative p-5 rounded-xl border transition-colors group', styles.card, !alert.isRead && 'ring-2 ring-primary/20')}
                 >
                     <button 
                         onClick={() => removeAlert(alert.id)}
@@ -172,20 +234,28 @@ export default function AlertsPage() {
                     <div className="flex-1">
                         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-1">
                         <div>
-                            <h3 className="font-semibold text-foreground">{alert.title}</h3>
+                            <h3 className="font-semibold text-foreground flex items-center gap-2">
+                              {alert.title}
+                              {!alert.isRead && <div className="w-2 h-2 rounded-full bg-primary" />}
+                            </h3>
                             <p className="text-sm text-muted-foreground mt-1 max-w-xl leading-relaxed">{alert.message}</p>
                         </div>
                         
                         </div>
                          <div className="mt-3 flex items-center justify-between">
                             <span className="text-xs text-muted-foreground font-medium">
-                                {new Date(alert.date).toLocaleDateString('en-US', {
+                                {new Date(alert.createdAt).toLocaleDateString('en-US', {
                                 month: 'short',
                                 day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
                                 })}
                             </span>
                              {alert.action && (
-                                <button className="inline-flex items-center gap-1 text-sm font-medium text-foreground hover:underline underline-offset-4 decoration-primary/50 transition-all">
+                                <button 
+                                  onClick={() => markAsRead.mutate({ id: alert.id })}
+                                  className="inline-flex items-center gap-1 text-sm font-medium text-foreground hover:underline underline-offset-4 decoration-primary/50 transition-all"
+                                >
                                     {alert.action} <ArrowRight className="w-3.5 h-3.5" />
                                 </button>
                                 )}
@@ -205,28 +275,29 @@ export default function AlertsPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="p-16 rounded-2xl border border-dashed border-border text-center bg-muted/5"
           >
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted text-muted-foreground mb-4">
-              <Bell className="w-8 h-8" />
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <Bell className="w-8 h-8 text-muted-foreground" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground">
-                {filter === 'all' ? "All caught up!" : `No ${filter} alerts`}
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              {filter === 'all' ? "All caught up!" : `No ${filter.toLowerCase()} alerts`}
             </h3>
-            <p className="text-muted-foreground mt-1">
-                {filter === 'all' 
-                    ? "Great job! You have no new alerts." 
-                    : `You don't have any ${filter} alerts at the moment.`}
+            <p className="text-muted-foreground mb-6">
+              {filter === 'all' 
+                ? "You're all caught up! Check back later for new insights." 
+                : `No ${filter.toLowerCase()} alerts to show right now.`
+              }
             </p>
-             {filter !== 'all' && (
-                 <button 
-                    onClick={() => setFilter('all')}
-                    className="mt-4 text-sm font-medium text-primary hover:underline"
-                 >
-                     View all alerts
-                 </button>
-             )}
+            <button 
+              onClick={() => generateBudgetAlerts.mutate()}
+              disabled={generateBudgetAlerts.isPending}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
+            >
+              <Zap className="w-4 h-4" />
+              {generateBudgetAlerts.isPending ? 'Checking...' : 'Check for Budget Alerts'}
+            </button>
           </motion.div>
         )}
       </div>
     </main>
   );
-};
+}
