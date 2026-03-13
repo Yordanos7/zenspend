@@ -1,0 +1,237 @@
+{
+  "name": "ZenSpend - Budget Monitor & Alerts",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 6
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/trpc/budget.getAll",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        }
+      },
+      "id": "fetch-budgets",
+      "name": "Fetch All Budgets",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Budget monitoring and alert generation\nconst budgets = $input.first().json.result?.data || [];\nconst alerts = [];\n\nfor (const budget of budgets) {\n  const percentage = budget.percentage || 0;\n  const categoryName = budget.category?.name || 'Unknown';\n  const spent = budget.spent || 0;\n  const limit = budget.limit || 0;\n  const remaining = limit - spent;\n  \n  // Generate alerts based on budget usage\n  if (percentage >= 100) {\n    // Over budget alert\n    alerts.push({\n      type: 'CRITICAL',\n      title: `${categoryName} Budget Exceeded`,\n      message: `You've exceeded your ${categoryName} budget by Birr ${Math.abs(remaining).toLocaleString()}. Consider reviewing your spending in this category.`,\n      category: categoryName,\n      budgetId: budget.id,\n      percentage: percentage,\n      priority: 'high',\n      action: 'Review Budget'\n    });\n  } else if (percentage >= 90) {\n    // Near limit warning\n    alerts.push({\n      type: 'WARNING',\n      title: `${categoryName} Budget Alert`,\n      message: `You've used ${percentage.toFixed(0)}% of your ${categoryName} budget. Only Birr ${remaining.toLocaleString()} remaining.`,\n      category: categoryName,\n      budgetId: budget.id,\n      percentage: percentage,\n      priority: 'medium',\n      action: 'Monitor Spending'\n    });\n  } else if (percentage >= 75) {\n    // Approaching limit info\n    alerts.push({\n      type: 'INFO',\n      title: `${categoryName} Budget Update`,\n      message: `You've used ${percentage.toFixed(0)}% of your ${categoryName} budget. You're doing well staying within limits.`,\n      category: categoryName,\n      budgetId: budget.id,\n      percentage: percentage,\n      priority: 'low',\n      action: 'View Progress'\n    });\n  }\n}\n\n// Add summary alert if multiple budgets are over limit\nconst overBudgetCount = alerts.filter(a => a.type === 'CRITICAL').length;\nif (overBudgetCount > 1) {\n  alerts.push({\n    type: 'CRITICAL',\n    title: 'Multiple Budget Alerts',\n    message: `You have ${overBudgetCount} categories over budget. Consider reviewing your overall spending strategy.`,\n    category: 'Overall',\n    budgetId: 'summary',\n    percentage: 100,\n    priority: 'high',\n    action: 'Review All Budgets'\n  });\n}\n\nreturn alerts.map(alert => ({ json: alert }));"
+      },
+      "id": "budget-analysis",
+      "name": "Budget Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/trpc/alert.create",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "httpMethod": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "type",
+              "value": "={{ $json.type }}"
+            },
+            {
+              "name": "title",
+              "value": "={{ $json.title }}"
+            },
+            {
+              "name": "message",
+              "value": "={{ $json.message }}"
+            },
+            {
+              "name": "action",
+              "value": "={{ $json.action }}"
+            }
+          ]
+        }
+      },
+      "id": "create-alerts",
+      "name": "Create Alerts",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "high-priority",
+              "leftValue": "={{ $json.priority }}",
+              "rightValue": "high",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-priority",
+      "name": "Check Priority",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Send push notification for high priority alerts\nconst alert = $input.first().json;\n\nreturn {\n  notification: {\n    title: alert.title,\n    body: alert.message,\n    icon: '/logo.png',\n    badge: '/logo.png',\n    tag: `budget-${alert.budgetId}`,\n    requireInteraction: true,\n    actions: [\n      {\n        action: 'view',\n        title: 'View Budget'\n      },\n      {\n        action: 'dismiss',\n        title: 'Dismiss'\n      }\n    ]\n  },\n  webhook_url: 'http://localhost:3001/api/notifications/push',\n  alert_data: alert\n};"
+      },
+      "id": "prepare-notification",
+      "name": "Prepare Notification",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 240]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3001/api/notifications/push",
+        "httpMethod": "POST",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "notification",
+              "value": "={{ $json.notification }}"
+            },
+            {
+              "name": "userId",
+              "value": "current-user"
+            }
+          ]
+        }
+      },
+      "id": "send-notification",
+      "name": "Send Push Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1560, 240]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Fetch All Budgets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch All Budgets": {
+      "main": [
+        [
+          {
+            "node": "Budget Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Budget Analysis": {
+      "main": [
+        [
+          {
+            "node": "Create Alerts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Alerts": {
+      "main": [
+        [
+          {
+            "node": "Check Priority",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Priority": {
+      "main": [
+        [
+          {
+            "node": "Prepare Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Notification": {
+      "main": [
+        [
+          {
+            "node": "Send Push Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "budget-monitor",
+  "tags": ["zenspend", "budget", "alerts", "monitoring"]
+}

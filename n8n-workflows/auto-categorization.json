@@ -1,0 +1,120 @@
+{
+  "name": "ZenSpend - Auto Transaction Categorization",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "categorize-transaction",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "auto-categorize"
+    },
+    {
+      "parameters": {
+        "jsCode": "// AI-powered transaction categorization logic\nconst transaction = $input.first().json;\n\n// Extract transaction details\nconst description = transaction.description.toLowerCase();\nconst amount = Math.abs(transaction.amount);\n\n// Category mapping rules\nconst categoryRules = {\n  food: [\n    'restaurant', 'cafe', 'pizza', 'burger', 'food', 'grocery', 'supermarket',\n    'mcdonalds', 'kfc', 'subway', 'starbucks', 'dominos', 'uber eats', 'doordash'\n  ],\n  transport: [\n    'uber', 'taxi', 'bus', 'train', 'gas', 'fuel', 'parking', 'metro',\n    'lyft', 'car', 'vehicle', 'transport', 'airline', 'flight'\n  ],\n  shopping: [\n    'amazon', 'ebay', 'walmart', 'target', 'mall', 'store', 'shop',\n    'clothing', 'fashion', 'electronics', 'purchase'\n  ],\n  utilities: [\n    'electric', 'water', 'gas', 'internet', 'phone', 'mobile', 'wifi',\n    'utility', 'bill', 'power', 'energy'\n  ],\n  entertainment: [\n    'netflix', 'spotify', 'movie', 'cinema', 'game', 'entertainment',\n    'subscription', 'streaming', 'music', 'youtube', 'disney'\n  ],\n  health: [\n    'hospital', 'doctor', 'pharmacy', 'medical', 'health', 'clinic',\n    'medicine', 'dental', 'insurance'\n  ],\n  housing: [\n    'rent', 'mortgage', 'property', 'home', 'house', 'apartment',\n    'maintenance', 'repair'\n  ]\n};\n\n// Find matching category\nlet detectedCategory = 'misc'; // default\nlet confidence = 0;\n\nfor (const [category, keywords] of Object.entries(categoryRules)) {\n  const matches = keywords.filter(keyword => description.includes(keyword));\n  if (matches.length > 0) {\n    const categoryConfidence = matches.length / keywords.length;\n    if (categoryConfidence > confidence) {\n      detectedCategory = category;\n      confidence = categoryConfidence;\n    }\n  }\n}\n\n// Amount-based adjustments\nif (amount > 1000 && detectedCategory === 'misc') {\n  detectedCategory = 'housing'; // Large amounts often housing\n} else if (amount < 10 && description.includes('coffee')) {\n  detectedCategory = 'food';\n}\n\n// Return categorized transaction\nreturn {\n  transactionId: transaction.id,\n  originalCategory: transaction.category,\n  suggestedCategory: detectedCategory,\n  confidence: Math.round(confidence * 100),\n  description: transaction.description,\n  amount: transaction.amount,\n  reasoning: `Detected '${detectedCategory}' based on keywords in description`\n};"
+      },
+      "id": "categorize-logic",
+      "name": "AI Categorization Logic",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/trpc/transaction.update",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "httpMethod": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "id",
+              "value": "={{ $json.transactionId }}"
+            },
+            {
+              "name": "categoryId",
+              "value": "={{ $json.suggestedCategory }}"
+            }
+          ]
+        }
+      },
+      "id": "update-transaction",
+      "name": "Update Transaction Category",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"category\": $('AI Categorization Logic').item.json.suggestedCategory, \"confidence\": $('AI Categorization Logic').item.json.confidence } }}"
+      },
+      "id": "response",
+      "name": "Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Categorization Logic",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Categorization Logic": {
+      "main": [
+        [
+          {
+            "node": "Update Transaction Category",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Transaction Category": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "auto-categorization",
+  "tags": ["zenspend", "automation", "ai"]
+}

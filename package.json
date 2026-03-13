@@ -25,6 +25,7 @@
   "dependencies": {
     "@zenspend/env": "*",
     "dotenv": "^17.2.2",
+    "recharts": "^3.8.0",
     "zod": "^4.1.13"
   },
   "devDependencies": {

@@ -1,0 +1,193 @@
+{
+  "name": "ZenSpend - Receipt OCR Processing",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "process-receipt",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "receipt-webhook",
+      "name": "Receipt Upload Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300],
+      "webhookId": "receipt-ocr"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract image data from upload\nconst body = $input.first().body;\nconst imageData = body.image; // Base64 encoded image\nconst userId = body.userId;\n\nif (!imageData) {\n  throw new Error('No image data provided');\n}\n\n// Prepare for OCR processing\nreturn {\n  imageData: imageData,\n  userId: userId,\n  timestamp: new Date().toISOString(),\n  processingId: `receipt_${Date.now()}`\n};"
+      },
+      "id": "extract-image",
+      "name": "Extract Image Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Mock OCR processing - In production, integrate with Google Vision API, AWS Textract, or similar\nconst imageData = $input.first().json.imageData;\n\n// Simulate OCR text extraction\nconst mockOcrResults = [\n  {\n    text: \"WALMART SUPERCENTER\\nDATE: 2024-01-15\\nTIME: 14:30\\nGROCERIES\\nBananas 2.99\\nMilk 3.49\\nBread 2.29\\nEggs 4.99\\nTOTAL: $13.76\\nCASH PAYMENT\",\n    confidence: 0.95\n  },\n  {\n    text: \"STARBUCKS COFFEE\\nDATE: 2024-01-15\\nTIME: 08:15\\nLatte Grande 5.45\\nCroissant 3.25\\nTOTAL: $8.70\\nCARD ****1234\",\n    confidence: 0.92\n  },\n  {\n    text: \"SHELL GAS STATION\\nDATE: 2024-01-14\\nTIME: 18:45\\nGASOLINE 15.5 GAL\\nPRICE PER GAL: $3.299\\nTOTAL: $51.13\\nCREDIT CARD\",\n    confidence: 0.88\n  }\n];\n\n// Select random mock result for demo\nconst selectedResult = mockOcrResults[Math.floor(Math.random() * mockOcrResults.length)];\n\nreturn {\n  ...($input.first().json),\n  ocrText: selectedResult.text,\n  confidence: selectedResult.confidence,\n  status: 'ocr_completed'\n};"
+      },
+      "id": "ocr-processing",
+      "name": "OCR Processing",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Parse OCR text to extract transaction details\nconst ocrText = $input.first().json.ocrText;\nconst lines = ocrText.split('\\n').map(line => line.trim());\n\n// Initialize transaction data\nlet transaction = {\n  description: '',\n  amount: 0,\n  date: new Date().toISOString().split('T')[0],\n  category: 'misc',\n  merchant: '',\n  confidence: $input.first().json.confidence\n};\n\n// Extract merchant name (usually first line)\nif (lines.length > 0) {\n  transaction.merchant = lines[0];\n  transaction.description = lines[0];\n}\n\n// Extract date\nfor (const line of lines) {\n  const dateMatch = line.match(/DATE:\\s*(\\d{4}-\\d{2}-\\d{2}|\\d{2}\\/\\d{2}\\/\\d{4}|\\d{2}-\\d{2}-\\d{4})/);\n  if (dateMatch) {\n    let dateStr = dateMatch[1];\n    // Convert to YYYY-MM-DD format\n    if (dateStr.includes('/')) {\n      const parts = dateStr.split('/');\n      dateStr = `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;\n    } else if (dateStr.includes('-') && dateStr.length === 10) {\n      const parts = dateStr.split('-');\n      if (parts[0].length === 2) {\n        dateStr = `20${parts[2]}-${parts[0]}-${parts[1]}`;\n      }\n    }\n    transaction.date = dateStr;\n    break;\n  }\n}\n\n// Extract total amount\nfor (const line of lines) {\n  const totalMatch = line.match(/TOTAL[:\\s]*\\$?([\\d,]+\\.\\d{2})/);\n  if (totalMatch) {\n    transaction.amount = -parseFloat(totalMatch[1].replace(',', '')); // Negative for expense\n    break;\n  }\n}\n\n// Determine category based on merchant\nconst merchantLower = transaction.merchant.toLowerCase();\nif (merchantLower.includes('walmart') || merchantLower.includes('grocery') || merchantLower.includes('supermarket')) {\n  transaction.category = 'food';\n} else if (merchantLower.includes('starbucks') || merchantLower.includes('coffee') || merchantLower.includes('restaurant')) {\n  transaction.category = 'food';\n} else if (merchantLower.includes('shell') || merchantLower.includes('gas') || merchantLower.includes('fuel')) {\n  transaction.category = 'transport';\n} else if (merchantLower.includes('amazon') || merchantLower.includes('store') || merchantLower.includes('mall')) {\n  transaction.category = 'shopping';\n}\n\n// Add processing metadata\ntransaction.source = 'receipt_ocr';\ntransaction.processingId = $input.first().json.processingId;\ntransaction.userId = $input.first().json.userId;\n\nreturn transaction;"
+      },
+      "id": "parse-receipt",
+      "name": "Parse Receipt Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000/api/trpc/transaction.create",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "httpMethod": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "description",
+              "value": "={{ $json.description }}"
+            },
+            {
+              "name": "amount",
+              "value": "={{ $json.amount }}"
+            },
+            {
+              "name": "date",
+              "value": "={{ $json.date }}"
+            },
+            {
+              "name": "categoryId",
+              "value": "={{ $json.category }}"
+            }
+          ]
+        }
+      },
+      "id": "create-transaction",
+      "name": "Create Transaction",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Prepare success response with transaction details\nconst transaction = $('Parse Receipt Data').first().json;\nconst apiResponse = $input.first().json;\n\nreturn {\n  success: true,\n  message: 'Receipt processed successfully',\n  transaction: {\n    id: apiResponse.result?.data?.id || 'generated',\n    description: transaction.description,\n    amount: transaction.amount,\n    date: transaction.date,\n    category: transaction.category,\n    merchant: transaction.merchant,\n    confidence: transaction.confidence,\n    source: 'receipt_ocr'\n  },\n  processingTime: Date.now() - new Date($('Extract Image Data').first().json.timestamp).getTime()\n};"
+      },
+      "id": "prepare-response",
+      "name": "Prepare Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}"
+      },
+      "id": "send-response",
+      "name": "Send Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1560, 300]
+    }
+  ],
+  "connections": {
+    "Receipt Upload Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract Image Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Image Data": {
+      "main": [
+        [
+          {
+            "node": "OCR Processing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OCR Processing": {
+      "main": [
+        [
+          {
+            "node": "Parse Receipt Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Receipt Data": {
+      "main": [
+        [
+          {
+            "node": "Create Transaction",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Transaction": {
+      "main": [
+        [
+          {
+            "node": "Prepare Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Response": {
+      "main": [
+        [
+          {
+            "node": "Send Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "receipt-ocr",
+  "tags": ["zenspend", "receipt", "ocr", "automation"]
+}

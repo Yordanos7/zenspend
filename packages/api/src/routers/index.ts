@@ -4,6 +4,7 @@ import { budgetRouter } from "./budget";
 import { categoryRouter } from "./category";
 import { goalRouter } from "./goal";
 import { alertRouter } from "./alert";
+import { automationRouter } from "./automation";
 
 export const appRouter = router({
   healthCheck: publicProcedure.query(() => {
@@ -22,5 +23,6 @@ export const appRouter = router({
   category: categoryRouter,
   goal: goalRouter,
   alert: alertRouter,
+  automation: automationRouter,
 });
 export type AppRouter = typeof appRouter;

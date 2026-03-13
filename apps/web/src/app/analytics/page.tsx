@@ -8,12 +8,12 @@ import {
   TrendingUp, TrendingDown, BarChart3, PieChart, Calendar,
   Download, Filter, RefreshCw, Target, Wallet, CreditCard,
   ArrowUpRight, ArrowDownRight, Activity, Zap, Award,
-  ChevronDown, Eye, FileText, Share2
+  ChevronDown, Eye, FileText, Share2, AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   LineChart, Line, AreaChart, Area, BarChart, Bar,
-  PieChart as RechartsPieChart, Cell, ResponsiveContainer,
+  PieChart as RechartsPieChart, Pie, Cell, ResponsiveContainer,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend
 } from 'recharts';
 

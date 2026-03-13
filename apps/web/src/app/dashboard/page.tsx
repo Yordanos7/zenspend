@@ -24,6 +24,7 @@ import { InsightCard } from "@/components/dashboard/InsightCard";
 import { ReceiptUploader } from "@/components/dashboard/ReceiptUploader";
 import { BudgetOverview } from "@/components/dashboard/BudgetOverview";
 import { GoalsOverview } from "@/components/dashboard/GoalsOverview";
+import { AnalyticsOverview } from "@/components/dashboard/AnalyticsOverview";
 import { Button } from "@/components/ui/button";
 import { trpc } from '@/utils/trpc';
 import Link from 'next/link';
@@ -238,14 +239,19 @@ export default function Dashboard() {
                 <RecentTransactions />
               </div>
 
-              {/* Budget Overview */}
-              <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200">
-                <BudgetOverview />
+              {/* Budget & Goals Row */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200">
+                  <BudgetOverview />
+                </div>
+                <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200">
+                  <GoalsOverview />
+                </div>
               </div>
 
-              {/* Goals Overview */}
+              {/* Analytics Overview */}
               <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all duration-200">
-                <GoalsOverview />
+                <AnalyticsOverview />
               </div>
 
               {/* Quick Actions Card */}
